@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .hideBtnHighlight {
+    @apply [-webkit-backface-visibility:hidden] [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none];
+  }
+
+  .hideScrollBar {
+    @apply [scrollbar-width:none] [-ms-overflow-style:none] 
+  }
+
+  .hideScrollBar::-webkit-scrollbar {
+    @apply [display:none]
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
