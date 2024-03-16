@@ -74,7 +74,7 @@ export default function Header({ className = "" }) {
         setUser(undefined); // Clear user context
         disconnect(); // Disconnect wallet as well.
         console.log("Signed out: ", data);
-        // router.push("/");
+        router.push("/");
       });
   }
 
@@ -85,7 +85,7 @@ export default function Header({ className = "" }) {
   }
   return (
     <>
-      <header className="flex justify-between items-center shadow px-4 py-2">
+      <header className="flex justify-between items-center shadow h-[48px] px-4 py-2">
         {/* Left Header Logo */}
         <h1 className="text-white font-bold ">ipfs-dapp</h1>
 

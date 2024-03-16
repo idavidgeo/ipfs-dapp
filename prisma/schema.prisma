@@ -23,8 +23,8 @@ model User {
 }
 
 model IpfsFile {
-  hash        String  @id @unique
+  hash        String @id @unique
   name        String
-  user        User?   @relation(fields: [userAddress], references: [address]) // Many-to-one
-  userAddress String?
+  user        User   @relation(fields: [userAddress], references: [address]) // Many-to-one
+  userAddress String
 }

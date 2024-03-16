@@ -12,7 +12,7 @@ export default function Layout({ children, className = "", title = "ipfs-dapp" }
         <title>{title}</title>
         {/* Meta, SEO and favicon still here  */}
       </Head>
-      <div className={`flex relative flex-col bg-neutral-700 min-h-screen ${className} ${poppins.className}`}>{children}</div>
+      <div className={`flex relative flex-col bg-neutral-700 min-h-[screen] min-h-[100svh] min-h-[-webkit-fill-available] ${className} ${poppins.className}`}>{children}</div>
     </>
   );
 }

@@ -8,19 +8,35 @@ const Header = dynamic(() => import("@/components/Header"), {
   ssr: false,
 });
 
-const Homepage = dynamic(() => import("@/components/Homepage"), {
-  ssr: false,
-});
-
-export default function IndexPage() {
+export default function FilesPage() {
   return (
     <Layout>
       {/* Wallet connect logic all in header  */}
       <Header />
 
       <main className="grow flex flex-col items-center justify-center gap-4">
-        <Homepage />
+        <Files />
+        <Upload />
       </main>
     </Layout>
   );
+}
+
+export async function getServerSideProps(context) {
+  const { cookies } = context.req;
+  const token = cookies.authCookie;
+
+  if (!token) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: `/`,
+      },
+      props: {},
+    };
+  }
+
+  return {
+    props: {},
+  };
 }
