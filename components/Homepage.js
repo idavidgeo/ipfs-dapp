@@ -5,9 +5,9 @@ export default function HomePage() {
   return (
     <main className="px-4 text-white text-center flex flex-col items-center justify-center grow ">
       {address && isConnected ? (
-        <h2>
-          Connected wallet <code className="border rounded-lg py-1 px-2 border-neutral-500 bg-neutral-600">{address}</code>
-        </h2>
+        <div className="flex flex-col gap-2">
+          Connected wallet <code className="border text-xs rounded-lg py-1 px-2 border-neutral-500 bg-neutral-600">{address}</code>
+        </div>
       ) : (
         <h2>Please connect and sign in.</h2>
       )}
