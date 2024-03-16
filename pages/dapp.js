@@ -14,7 +14,7 @@ export default function FilesPage() {
       {/* Wallet connect logic all in header  */}
       <Header />
 
-      <main className="grow flex flex-col items-center justify-center gap-4">
+      <main className="grow flex flex-col items-center my-4 gap-4">
         <Files />
         <Upload />
       </main>
