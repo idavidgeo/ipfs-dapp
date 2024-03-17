@@ -23,8 +23,11 @@ model User {
 }
 
 model IpfsFile {
-  hash        String @id @unique
+  id          Int    @id @default(autoincrement())
+  hash        String
   name        String
-  user        User   @relation(fields: [userAddress], references: [address]) // Many-to-one
+  user        User?  @relation(references: [address], fields: [userAddress]) // Many-to-one
   userAddress String
+
+  @@unique([name, userAddress]) // Unique constraint on the combination of name and userAddress
 }

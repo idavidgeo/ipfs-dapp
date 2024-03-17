@@ -1,12 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import axios from "axios";
 import { useState } from "react";
-import { useAccount } from "wagmi";
 
-export default function Upload() {
-  const { address, isConnected } = useAccount();
+export default function Upload({ isLoading, setIsLoading, triggerRefetech }) {
   const [imgData, setImgData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState();
 
   function fileDragged(e) {
     e.preventDefault();
@@ -15,8 +13,6 @@ export default function Upload() {
         window.alert("One file at a time please!");
         return;
       }
-      console.log("image(s) dragged n dropped!");
-      console.log(e.dataTransfer.files);
       setImgData([...imgData, ...e.dataTransfer.files]);
     }
   }
@@ -24,8 +20,6 @@ export default function Upload() {
   function fileAdded(e) {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
-      console.log("image(s) added via select!");
-      console.log(e.target.files);
       if (e.target.files.length + imgData.length > 1) {
         window.alert("One file at a time please!");
         return;
@@ -39,20 +33,31 @@ export default function Upload() {
   }
 
   // NOTE: Very inefficient!!!!! - TODO: add cache layer and optimistic updates (w/revert on fail)
-  function onUpload() {
+  async function onUpload() {
     if (!imgData) {
       return;
     }
     setIsLoading(true);
 
-    console.log("Uploading: ", imgData[0]);
-    const headers = { "Content-Type": "multipart/form-data" };
+    const formData = new FormData();
+    formData.append("file", imgData[0]);
+    formData.append("pinataMetadata", JSON.stringify({ name: imgData[0].name }));
 
-    axios.post("/api/secure/upload?fileName=" + imgData[0].name, imgData[0], headers).then((data) => {
-      console.log("Upload: ", data);
-      setImgData([]);
+    try {
+      const pinFileToIPFS = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", formData, {
+        headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_PINATA_IPFS_API}` },
+      });
+      console.log("File uploaded to ipfs: ", pinFileToIPFS.data);
+      await axios.post("/api/secure/upload", { ipfsHash: pinFileToIPFS.data?.IpfsHash, fileName: imgData[0].name });
+    } catch ({ response }) {
+      setMessage({ error: true, text: response.data.error });
       setIsLoading(false);
-    });
+      setImgData([]);
+      return console.error("Error saving file");
+    }
+    setIsLoading(false);
+    setImgData([]);
+    triggerRefetech();
   }
 
   return (
@@ -103,8 +108,9 @@ export default function Upload() {
         className="text-white w-full text-lg self-end sm:w-40 bg-green-600 hover:opacity-80 disabled:bg-stone-600 disabled:cursor-not-allowed active:shadow-none font-bold px-4 p-2 rounded-full shadow select-none hideBtnHighlight"
         type="button"
       >
-        {isLoading ? "Uploading..." : "Upload"}
+        {isLoading && imgData.length ? "Uploading..." : "Upload"}
       </button>
+      {message && <span className={`text-xs ${message.error ? "text-red-500" : "text-green-500"}`}>{message.text}</span>}
     </section>
   );
 }

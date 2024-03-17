@@ -1,15 +1,20 @@
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
-import { v4 as uuidv4 } from "uuid";
 
 const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
-  const { cookies } = req;
+  const { cookies, body } = req;
   const token = cookies.authCookie;
+
+  // TODO: sanitize data
 
   if (!token) {
     return res.status(401).json({ message: "not authorized" });
+  }
+
+  if (!body.ipfsHash || !body.fileName) {
+    return res.status(401).json({ message: "invalid data" });
   }
 
   try {
@@ -18,29 +23,29 @@ export default async function handler(req, res) {
     return res.status(401).json({ message: "not authorized" });
   }
 
-  console.log("uplading...", req.query.fileName);
-
-  const ipfshash = uuidv4(); // TODO: should be the ipfshash
   const address = jwt.decode(token)?.address.toLowerCase();
 
   try {
     // Add file to prisma
-    const fileUpload = await prisma.ipfsFile.create({ data: { hash: ipfshash, name: req.query.fileName, userAddress: address } });
-    console.log("File uploaded: ", fileUpload);
+    const saveHash = await prisma.ipfsFile.create({ data: { hash: req.body.ipfsHash, name: req.body.fileName, userAddress: address } });
+    // console.log("File uploaded: ", saveHash);
 
     // Relate to user/uploader
-    const relateFileToUser = await prisma.user.update({
+    await prisma.user.update({
       where: { address: address },
       data: {
         ipfsFiles: {
           connect: {
-            hash: fileUpload.hash,
+            id: saveHash.id,
           },
         },
       },
     });
   } catch (e) {
-    console.log("Failed uploading file: ", e);
+    // console.log("Failed uploading file: ", e);
+    if (e.code == "P2002") {
+      return res.status(409).json({ error: "file already exists" });
+    }
     return res.status(500).json({ error: "error" });
   }
 
