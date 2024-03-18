@@ -108,7 +108,7 @@ export default function Header({ className = "" }) {
 
             {ethBalance ? (
               <span title={address} className="text-white text-xs bg-neutral-600 font-bold px-4 p-2 rounded-full shadow">
-                {ethBalance.formatted + " " + ethBalance.symbol} • {address.slice(0, 6)}
+                {Number.parseFloat(ethBalance.formatted).toFixed(2) + " " + ethBalance.symbol} • {address.slice(0, 6)}
               </span>
             ) : (
               <span className=" bg-neutral-600 px-4 p-2 rounded-full shadow">
