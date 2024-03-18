@@ -81,7 +81,10 @@ export default function Header({ className = "" }) {
   function onConnect(connector) {
     connectAsync({ connector })
       .then(() => setShowPortal(false))
-      .catch(() => console.error("Failed connecting to wallet"));
+      .catch(() => {
+        console.error("Failed connecting to wallet");
+        window.alert("No injected wallet detected. Make sure a wallet extension is installed.");
+      });
   }
   return (
     <>
